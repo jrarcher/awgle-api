@@ -4,6 +4,8 @@ Address = require('../models/address.js'),
 mongoose = require('mongoose'),
 async = require('async');
 
+
+
 exports.index = function(req, res){
 	// res.send('show all companies');
 	Company.find({},{_id:0}, function(err,docs){
