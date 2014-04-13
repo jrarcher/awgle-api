@@ -6,7 +6,7 @@
 var express = require('express'),
 routes = require('./routes'),
 // user = require('./controllers/user'),
-map = require('maproutecontroller'),
+map = require('./controllers/maproutecontroller'),
 http = require('http'),
 path = require('path'),
 mongoose = require('mongoose');
