@@ -1,15 +1,15 @@
-
-/**
- * Module dependencies.
- */
-
 var express = require('express'),
 routes = require('./routes'),
 // user = require('./controllers/user'),
 map = require('./controllers/maproutecontroller'),
 http = require('http'),
 path = require('path'),
-mongoose = require('mongoose');
+mongoose = require('mongoose'),
+passport = require('passport'),
+log = require('./libs/log')(module),
+config = require('./libs/config'),
+oauth2 = require('./libs/oauth2'),
+ClientModel = require('./models/client.js');
 
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -28,26 +28,61 @@ var allowCrossDomain = function(req, res, next) {
 var app = express();
 
 // all environments
-app.set('port', process.env.PORT || 3000);
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+
 app.use(allowCrossDomain);
 app.use(express.favicon());
 app.use(express.logger('dev'));
+app.use(express.bodyParser());
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(passport.initialize());
 app.use(express.methodOverride());
 app.use(app.router);
-app.use(express.static(path.join(__dirname, 'public')));
+
+// app.use(express.static(path.join(__dirname, 'public')));
+
+require('./libs/auth');
+
+// app.use(function(req, res, next){
+//     res.status(404);
+//     log.debug('Not found URL: %s',req.url);
+//     res.send({ error: 'Not found' });
+//     return;
+// });
+
+// app.use(function(err, req, res, next){
+//     res.status(err.status || 500);
+//     log.error('Internal error(%d): %s',res.statusCode,err.message);
+//     res.send({ error: err.message });
+//     return;
+// });
+
+app.post('/oauth/token', oauth2.token);
 
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-mongoose.connect('mongodb://127.0.0.1/AwgleDb');
-mongoose.connection.on('open', function(){
-	console.log('Connected to Mongoose');
+mongoose.connect(config.get('mongoose:uri'));
+var db = mongoose.connection;
+
+db.on('error', function (err) {
+    log.error('connection error:', err.message);
+});
+
+db.once('open', function callback () {
+    log.info("Connected to DB!");
+    ClientModel.remove({}, function(err) {
+        var client = new ClientModel({ 
+            name: "Awgle API", 
+            clientId: "webApp1", 
+            clientSecret:"2pennie$" 
+        });
+        client.save(function(err, client) {
+            if(err) return log.error(err);
+            else log.info("New client - %s:%s",client.clientId,client.clientSecret);
+        });
+    });
 });
 
 // app.get('/', routes.index);
@@ -58,6 +93,6 @@ prefixes.forEach(function(prefix){
 	map.mapRoute(app, prefix);
 });
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+http.createServer(app).listen(config.get('port'), function(){
+    log.info('Express server listening on port ' + config.get('port'));
 });
