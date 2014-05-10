@@ -21,7 +21,7 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
         if (!user) { return done(null, false); }
         if (!user.checkPassword(password)) { return done(null, false); }
 
-        log.info('userID: ' +user.userId);
+        // log.info('userID: ' +user.userId);
 
         
 
@@ -52,20 +52,20 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
 
         var info = { scope: '*' };
 
-        var _user = user.toObject();
+        // var _user = user.toObject();
 
-        delete _user['_id'];
-        delete _user['hashedPassword'];
-        delete _user['salt'];
+        // delete _user['_id'];
+        // delete _user['hashedPassword'];
+        // delete _user['salt'];
 
-        var _thisUser = JSON.stringify(_user);
+        // var _thisUser = JSON.stringify(_user);
 
         token.save(function (err, token) {
             if (err) { return done(err); }
             done(null, tokenValue, refreshTokenValue, 
                 { 
                     'expires_in': config.get('security:tokenLife'),
-                    'user' : _thisUser 
+                    'user' : user.userId 
                 });
         });
     });

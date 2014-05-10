@@ -93,7 +93,7 @@ exports.create = function(req, res){
 
 exports.show = function(req, res){
 	var id = req.params.id;
-	User.findOne({id: id}, function(err,doc){
+	User.findOne({id: id}, {_id:0, hashedPassword:0, salt:0}, function(err,doc){
 		if (err){
 			console.log('No user ' + id);
 			res.json(404, {reply:'Not Found'});
