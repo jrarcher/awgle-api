@@ -1,11 +1,13 @@
 var User = require('../models/user.js'),
 Address = require('../models/address.js'),
 Name = require('../models/name.js'),
+Right = require('../models/right.js'),
 mongoose = require('mongoose'),
-async = require('async');
+async = require('async'),
+log = require('../libs/log')(module);
 
 exports.index = function(req, res){
-	User.find({},{password:0, _id:0}, function(err, docs){
+	User.find({},{hashedPassword:0, salt:0, _id:0}, function(err, docs){
 		if (err){
 			res.json(404, {reply:err});
 		}
@@ -20,6 +22,7 @@ exports.create = function(req, res){
 	addy = req.body.user.address,
 	userId = mongoose.Types.ObjectId();
 	// console.log('userId: ' + userId);
+	log.info('creating user object');
 	var user = {
 		id: userId,
 		username: req.body.user.username,
@@ -28,7 +31,7 @@ exports.create = function(req, res){
 		address:[],
 		points: req.body.user.points,		
 		verified: req.body.user.verified,
-		// rights: req.body.rights,
+		right: [],
 		birth: Date.parse(req.body.user.birth),
 		created: new Date,
 		gender:req.body.user.gender 
@@ -44,7 +47,7 @@ exports.create = function(req, res){
 		}
 		else{
 			var userObj = new User(user);
-
+log.info('creating address object');
 			//Add address
 			var addyId = mongoose.Types.ObjectId();
 			var address = new Address({
@@ -57,6 +60,8 @@ exports.create = function(req, res){
 				country: addy.country,
 			});
 
+log.info('creating name object');
+
 			//Add Name
 			var nameId = mongoose.Types.ObjectId();
 			var name = new Name({
@@ -65,12 +70,20 @@ exports.create = function(req, res){
 				last: names.last,
 				middle: names.middle,
 				prefix: names.prefix,
-				suffix: names.suffix,
-				owner:userId
+				suffix: names.suffix
 			});
+
+log.info('creating rights object');
+			//Add rights
+			var rightId = mongoose.Types.ObjectId();
+			var rights = new Right({
+				id:rightId,
+				isAdmin:req.body.user.right.isAdmin
+			})
 
 			userObj.address.push(address);
 			userObj.name.push(name);
+			userObj.right.push(rights);
 
 			//persist user object
 			userObj.save(function(err, data){
@@ -100,8 +113,6 @@ exports.show = function(req, res){
 		}
 		else{
 			var user = doc.toObject();
-			delete user['password'];
-
 			var retDoc = {};
 			retDoc['user'] = user;
 			res.json(200, retDoc);

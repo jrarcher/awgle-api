@@ -3,6 +3,7 @@ crypto = require('crypto'),
 userSchema = mongoose.Schema,
 addy = require('../models/address.js'),
 namey = require('../models/name.js'),
+right = require('../models/right.js'),
 ObjectId = mongoose.Schema.Types.ObjectId,
 log = require('../libs/log')(module);
 
@@ -25,7 +26,7 @@ var User = new userSchema({
 	address:[addy.Address],
 	points: Number,
 	verified: Boolean,
-	// rights:[],
+	right:[right.Right],
 	birth: Date,
 	created: {
 		type: Date,

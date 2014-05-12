@@ -52,14 +52,6 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
 
         var info = { scope: '*' };
 
-        // var _user = user.toObject();
-
-        // delete _user['_id'];
-        // delete _user['hashedPassword'];
-        // delete _user['salt'];
-
-        // var _thisUser = JSON.stringify(_user);
-
         token.save(function (err, token) {
             if (err) { return done(err); }
             done(null, tokenValue, refreshTokenValue, 
