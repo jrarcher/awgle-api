@@ -111,10 +111,22 @@ server.exchange(oauth2orize.exchange.refreshToken(function(client, refreshToken,
             refreshToken.save(function (err) {
                 if (err) { return done(err); }
             });
-            var info = { scope: '*' }
+            var info = { scope: '*' };
+
+            var _user = user.toObject();
+            delete _user.hashedPassword;
+            delete _user._id;
+            delete _user.salt;
+
+            _user = JSON.stringify(_user);
+
             token.save(function (err, token) {
                 if (err) { return done(err); }
-                done(null, tokenValue, refreshTokenValue, { 'expires_in': config.get('security:tokenLife') });
+                done(null, tokenValue, refreshTokenValue, 
+                    { 
+                    'expires_in': config.get('security:tokenLife'),
+                    'user' : _user 
+                    });
             });
         });
     });

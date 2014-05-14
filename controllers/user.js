@@ -47,7 +47,7 @@ exports.create = function(req, res){
 		}
 		else{
 			var userObj = new User(user);
-log.info('creating address object');
+
 			//Add address
 			var addyId = mongoose.Types.ObjectId();
 			var address = new Address({
@@ -59,8 +59,6 @@ log.info('creating address object');
 				zip: addy.zip,
 				country: addy.country,
 			});
-
-log.info('creating name object');
 
 			//Add Name
 			var nameId = mongoose.Types.ObjectId();
