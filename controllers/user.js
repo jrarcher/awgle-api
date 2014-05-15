@@ -71,13 +71,22 @@ exports.create = function(req, res){
 				suffix: names.suffix
 			});
 
-log.info('creating rights object');
 			//Add rights
 			var rightId = mongoose.Types.ObjectId();
 			var rights = new Right({
 				id:rightId,
-				isAdmin:req.body.user.right.isAdmin
-			})
+				isAdmin:req.body.user.right.isAdmin,
+				canMakeAdmin:req.body.user.right.canMakeAdmin,
+				canViewUser:req.body.user.right.canViewUser,
+				canEditUser:req.body.user.right.canEditUser,
+				canDeleteUser:req.body.user.right.canDeleteUser,
+				canViewCompany:req.body.user.right.canViewCompany,
+				canEditCompany:req.body.user.right.canEditCompany,
+				canDeleteCompany:req.body.user.right.canDeleteCompany,
+				canViewSurvey:req.body.user.right.canViewSurvey,
+				canEditSurvey:req.body.user.right.canEditSurvey,
+				canDeleteSurvey:req.body.user.right.canDeleteSurvey
+			});
 
 			userObj.address.push(address);
 			userObj.name.push(name);
