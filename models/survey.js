@@ -27,8 +27,8 @@ var Survey = new surveySchema({
 		lon: String,
 		time: Date
 	},
-	questions: [],
-	answers: []
+	question: [question.Question],
+	answer: [answer.Answer]
 });
 
 module.exports = mongoose.model('Survey', Survey);

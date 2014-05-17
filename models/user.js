@@ -38,19 +38,16 @@ var User = new userSchema({
 User.methods.encryptPassword = function(password) {
     // return crypto.createHmac('sha1', this.salt).update(password).digest('hex');
     //more secure – 
-    log.info('ecrypting password');
     return crypto.pbkdf2Sync(password, this.salt, 10000, 512);
 };
 
 User.virtual('userId')
     .get(function () {
-    	log.info("trying pass");
         return this.id;
 	});
 
 User.virtual('password')
     .set(function(password) {
-    	log.info('hashing password');
         this._plainPassword = password;
         // this.salt = crypto.randomBytes(32).toString('base64');
         //more secure - 
@@ -63,8 +60,6 @@ User.methods.checkPassword = function(password) {
 	var encPass = this.encryptPassword(password).toString();
 	var hashPass = this.hashedPassword;
 	var isSame = encPass === hashPass;
-	log.info(typeof encPass + ':' + typeof hashPass);
-	log.info('PAssword is Same: ' + isSame);
     return isSame;
 };
 

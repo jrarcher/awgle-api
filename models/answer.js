@@ -1,8 +1,9 @@
 var mongoose = require('mongoose'),
-answerSchema = mongoose.Schema;
+AnswerSchema = mongoose.Schema,
+ObjectId = mongoose.Schema.Types.ObjectId;
 
-var Answer = new answerSchema({
-	qid: String,
+var Answer = new AnswerSchema({
+	id: ObjectId,
 	rating: String,
 	comment: String
 });    
