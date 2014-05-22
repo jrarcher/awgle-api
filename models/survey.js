@@ -1,34 +1,29 @@
 var mongoose = require('mongoose'),
 surveySchema = mongoose.Schema,
 question = require('../models/question.js'),
-answer = require('../models/answer.js'),
+// answer = require('../models/answer.js'),
+// geodata = require('../models/geodata.js'),
 ObjectId = mongoose.Schema.Types.ObjectId;
 
 var Survey = new surveySchema({
 	id: ObjectId,
-	camp_id: String,
 	cid: String,
-	cid_sub: String,
-	created: Date,
+	created: {
+		type: Date,
+		default: Date.now
+	},
 	expires: Date,
 	points: Number,
-	has_reward: Boolean,
-	last_edited: Date,
+	// has_reward: Boolean,
+	// reward:
+	// last_edited: Date,
 	status: String,
 	description: String,
-	scan_uid: String,
-	request: {
-		lat: String,
-		lon: String,
-		time: Date
-	},
-	response: {
-		lat: String,
-		lon: String,
-		time: Date
-	},
+	// scan_uid: String,
+	// request: [geodata.Geodata],
+	// response: [geodata.Geodata],
 	question: [question.Question],
-	answer: [answer.Answer]
+	// answer: [answer.Answer]
 });
 
 module.exports = mongoose.model('Survey', Survey);
