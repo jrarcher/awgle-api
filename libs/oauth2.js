@@ -21,10 +21,6 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
         if (!user) { return done(null, false); }
         if (!user.checkPassword(password)) { return done(null, false); }
 
-        // log.info('userID: ' +user.userId);
-
-        
-
         RefreshTokenModel.remove({ userId: user.userId, clientId: client.clientId }, function (err) {
             if (err) return done(err);
         });
@@ -77,9 +73,18 @@ server.exchange(oauth2orize.exchange.refreshToken(function(client, refreshToken,
         if (!token) { return done(null, false); }
         if (!token) { return done(null, false); }
 
-        UserModel.findById(token.userId, function(err, user) {
-            if (err) { return done(err); }
-            if (!user) { return done(null, false); }
+        // log.info('HERE 1 -- token: ' +token);
+
+        UserModel.findOne({id:token.userId}, function(err, user) {
+            if (err) { 
+                // log.info('GENERAL ERROR');
+                return done(err); 
+            }
+            if (!user) { 
+                // log.info('USER ERROR');
+                log.info(token);
+                return done(null, false); 
+            }
 
             RefreshTokenModel.remove({ 
                 userId: user.userId, 
