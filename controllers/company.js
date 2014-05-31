@@ -120,7 +120,6 @@ exports.destroy = function(req, res){
 exports.update = function(req, res){
 	// res.send('update a company');
 	var id = req.params.id;
-
 	var phones = req.body.company.phone;
 
 	phones.forEach(function(phone){
@@ -129,22 +128,9 @@ exports.update = function(req, res){
 		}
 	});
 
-	// var savePhone = function(phone, doneCall){
-	// 	console.log('ID: ' + phone.id);
-	// 		if (err) return doneCall(err);
-	// 		console.log('doc: ' + doc)
-	// 		return doneCall(null, doc);
-	// };
-
 	Company.findOneAndUpdate({id: id}, req.body.company, function(err, doc){
 		if (err) res.json(404);
 
-		// async.map(req.body.company.phone, savePhone, function(err, results){
-		// 	if (err) res.json(404);
-		// 	console.log(results);
-		// 	doc.phone = results;
-		// 	res.json(200, doc);
-		// });
 		var retDoc={};
 		retDoc['company'] = doc;
 

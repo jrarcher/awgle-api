@@ -3,6 +3,7 @@ surveySchema = mongoose.Schema,
 question = require('../models/question.js'),
 // answer = require('../models/answer.js'),
 // geodata = require('../models/geodata.js'),
+reward = require('../models/reward.js'),
 ObjectId = mongoose.Schema.Types.ObjectId;
 
 var Survey = new surveySchema({
@@ -12,18 +13,19 @@ var Survey = new surveySchema({
 		type: Date,
 		default: Date.now
 	},
-	expires: Date,
+	start: {
+		type: Date,
+		default: Date.now
+	},
+	end: {
+		type:Date,
+		default: Date.now
+	},
 	points: Number,
-	// has_reward: Boolean,
-	// reward:
-	// last_edited: Date,
+	reward:[reward.Reward],
 	status: String,
 	description: String,
-	// scan_uid: String,
-	// request: [geodata.Geodata],
-	// response: [geodata.Geodata],
-	question: [question.Question],
-	// answer: [answer.Answer]
+	question: [question.Question]
 });
 
 module.exports = mongoose.model('Survey', Survey);
