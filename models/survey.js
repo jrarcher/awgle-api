@@ -8,6 +8,7 @@ ObjectId = mongoose.Schema.Types.ObjectId;
 
 var Survey = new surveySchema({
 	id: ObjectId,
+	name: String,
 	cid: String,
 	created: {
 		type: Date,

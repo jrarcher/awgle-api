@@ -7,7 +7,9 @@ log = require('../libs/log')(module);
 
 exports.index = function(req, res){
 	// res.send('show all surveys');
-	Survey.find({}, {_id:0}, function(err,docs){
+	var params = {};
+	log.info('here: ' + req.query.cid);
+	Survey.find(params, {_id:0}, function(err,docs){
 		if (err){
 			res.json(404,{reply:err});
 		}
@@ -24,6 +26,7 @@ exports.create = function(req, res){
 	log.info('createing survey object');
 	var survey = {
 		id:surveyId,
+		name: _survey.name,
 		cid:_survey.cid,
 		start:_survey.start,
 		end:_survey.end,
@@ -37,7 +40,7 @@ exports.create = function(req, res){
 	var surveyObj = new Survey(survey);
 
 	//Add questions
-	survey.question.forEach(function(question){
+	_survey.question.forEach(function(question){
 		var questionId = mongoose.Types.ObjectId();
 		var _question = new Question({
 			id:questionId,
@@ -58,7 +61,7 @@ exports.create = function(req, res){
 				_question.choice.push(_choice);
 			})
 		}
-		survey.question.push(_question);
+		surveyObj.question.push(_question);
 	});
 
 	surveyObj.save(function(err,data){

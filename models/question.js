@@ -8,7 +8,7 @@ var Question = new QuestionSchema({
 	order: Number,
 	text: String,
 	type: String,
-	format:String,
+	format:Number,
 	choice:[choice.Choice]
 });
 
