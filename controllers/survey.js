@@ -7,7 +7,8 @@ log = require('../libs/log')(module);
 
 exports.index = function(req, res){
 	// res.send('show all surveys');
-	Survey.find({}, {_id:0}, function(err,docs){
+	// log.info(req.query.cid);
+	Survey.find({cid:req.query.cid}, {_id:0}, function(err,docs){
 		if (err){
 			res.json(404,{reply:err});
 		}

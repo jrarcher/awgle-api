@@ -5,6 +5,7 @@ addy = require('../models/address.js'),
 namey = require('../models/name.js'),
 right = require('../models/right.js'),
 ObjectId = mongoose.Schema.Types.ObjectId,
+Mixed = mongoose.Schema.Types.Mixed,
 log = require('../libs/log')(module);
 
 var User = new userSchema({
@@ -22,17 +23,17 @@ var User = new userSchema({
 		type: String,
 		required:true
 	},
-	name:[namey.Name],
-	address:[addy.Address],
+	name: Mixed,
+	address: Mixed,
+	right: Mixed,
 	points: Number,
 	verified: Boolean,
-	right:[right.Right],
 	birth: Date,
 	created: {
 		type: Date,
 		default: Date.now
 	},
-	gender:String      
+	gender:String   
 });
 
 User.methods.encryptPassword = function(password) {
