@@ -7,8 +7,8 @@ var Name = new nameSchema({
 	first: String,
 	last: String,
 	middle: String,
-	prefix: String,
-	suffix: String
+	prefix: Number,
+	suffix: Number
 }, {_id:false});
 
 module.exports = mongoose.model('Name', Name);

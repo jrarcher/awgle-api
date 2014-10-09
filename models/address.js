@@ -7,7 +7,7 @@ var Address = new addressSchema({
 	street1: String,
 	street2: String,
 	city: String,
-	state: String,
+	state: Number,
 	zip: String,
 	country: String,
 	lat: String,

@@ -4,32 +4,7 @@ var User = require('../models/user.js'),
 	Right = require('../models/right.js'),
 	mongoose = require('mongoose'),
 	async = require('async'),
-	log = require('../libs/log')(module),
-	transformUser = function(doc, done) {
-		// var item = {};
-		// item.id = doc.id;
-		// item.username = doc.username;
-		// item.points = doc.points;
-		// item.verified = doc.verified;
-		// item.birth = doc.birth;
-		// item.created = doc.created;
-		// item.gender = doc.gender;
-
-		// item.name = doc.name[0].id;
-		// item.address = doc.address[0].id;
-		// item.right = doc.right[0].id;
-
-		// item.names = [doc.name];
-		// item.addresses = [doc.address[0]];
-		// item.rights = [doc.right[0]];
-
-		var item = doc;
-
-		item.name = doc.name[0].id;
-		item.names.push(doc.name[0]);
-
-		return done(null, item);
-	};
+	log = require('../libs/log')(module);
 
 exports.index = function(req, res) {
 	User.find({}, {
@@ -44,67 +19,56 @@ exports.index = function(req, res) {
 			});
 		}
 		//build as sideloaded items
-		var items = docs;
-		async.series({
-			names: function(done) {
-				async.map(items, function(doc, cb) {
-					cb(null, doc.name[0]);
-				}, function(err, results) {
-					if (err) {
-						done(err);
-					}
-					done(null, results);
-				})
-			},
-			rights: function(done) {
-				async.map(items, function(doc, cb) {
-					cb(null, doc.right[0]);
-				}, function(err, results) {
-					if (err) {
-						done(err);
-					}
-					done(null, results);
-				})
-			},
-			addresses: function(done) {
-				async.map(items, function(doc, cb) {
-					cb(null, doc.address[0]);
-				}, function(err, results) {
-					if (err) {
-						done(err);
-					}
-					done(null, results);
-				})
-			},
-			users: function(done) {
-				async.map(docs, function(doc, cb) {
-					doc.name = doc.name[0].id;
-					doc.address = doc.address[0].id;
-					doc.right = doc.right[0].id;
-					cb(null, doc);
-				}, function(err, results) {
-					if (err) {
-						done(err);
-					}
-					done(null, results);
-				})
-			}
-		}, function(err, results) {
-			//the whole enchilada
-			res.json(200, results);
+		sendSideloaded(res, docs);
+		// async.series({
+		// 	names: function(done) {
+		// 		async.map(docs, function(doc, cb) {
+		// 			cb(null, doc.name[0]);
+		// 		}, function(err, results) {
+		// 			if (err) {
+		// 				done(err);
+		// 			}
+		// 			done(null, results);
+		// 		})
+		// 	},
+		// 	rights: function(done) {
+		// 		async.map(docs, function(doc, cb) {
+		// 			cb(null, doc.right[0]);
+		// 		}, function(err, results) {
+		// 			if (err) {
+		// 				done(err);
+		// 			}
+		// 			done(null, results);
+		// 		})
+		// 	},
+		// 	addresses: function(done) {
+		// 		async.map(docs, function(doc, cb) {
+		// 			cb(null, doc.address[0]);
+		// 		}, function(err, results) {
+		// 			if (err) {
+		// 				done(err);
+		// 			}
+		// 			done(null, results);
+		// 		})
+		// 	},
+		// 	users: function(done) {
+		// 		async.map(docs, function(doc, cb) {
+		// 			doc.name = doc.name[0].id;
+		// 			doc.address = doc.address[0].id;
+		// 			doc.right = doc.right[0].id;
+		// 			cb(null, doc);
+		// 		}, function(err, results) {
+		// 			if (err) {
+		// 				done(err);
+		// 			}
+		// 			done(null, results);
+		// 		})
+		// 	}
+		// }, function(err, results) {
+		// 	//the whole enchilada
+		// 	res.json(200, results);
 
-		});
-		// async.map(docs, transformUser,
-		// 	function(err, users) {
-		// 		if (err) {
-		// 			res.json(404, {
-		// 				reply: err
-		// 			});
-		// 		}
-		// 		var retDoc = {};
-		// 		retDoc["users"] = users;
-		// 		res.json(200, retDoc);
-		// 	});
+		// });
 	});
 };
 
@@ -117,7 +81,7 @@ exports.create = function(req, res) {
 	var user = {
 		id: userId,
 		username: req.body.user.username,
-		password: req.body.user.password,
+		password: req.body.user.pass,
 		name: [],
 		address: [],
 		points: req.body.user.points,
@@ -127,18 +91,24 @@ exports.create = function(req, res) {
 		created: new Date,
 		gender: req.body.user.gender
 	};
-
+	log.info('check for username');
 	//check for username unique, if passes save the user
 	User.findOne({
 		username: req.body.user.username
 	}, function(err, doc) {
 		if (err) {
+			log.info('General Error: 404');
 			res.json(404);
 		} else if (doc) {
-			res.json(409);
+			log.info('Already exists: 409');
+			res.json(409, {
+				errorCode: 409,
+				errorText: 'Invalid username'
+			});
 		} else {
+			log.info('All good: 200');
 			var userObj = new User(user);
-
+			log.info('creating address');
 			//Add address
 			var addyId = mongoose.Types.ObjectId();
 			var address = new Address({
@@ -150,7 +120,7 @@ exports.create = function(req, res) {
 				zip: addy.zip,
 				country: addy.country,
 			});
-
+			log.info('creating name');
 			//Add Name
 			var nameId = mongoose.Types.ObjectId();
 			var name = new Name({
@@ -161,7 +131,7 @@ exports.create = function(req, res) {
 				prefix: names.prefix,
 				suffix: names.suffix
 			});
-
+			log.info('creating rights');
 			//Add rights
 			var rightId = mongoose.Types.ObjectId();
 			var rights = new Right({
@@ -183,18 +153,25 @@ exports.create = function(req, res) {
 			userObj.name.push(name);
 			userObj.right.push(rights);
 
+			log.info('persisting');
 			//persist user object
 			userObj.save(function(err, data) {
 				if (err) {
-					console.log('save user error: ' + err);
-					res.json(404);
+					login.info('save user error: ' + err);
+					res.json(404, {
+						errorCode: 404,
+						errorText: err
+					});
 				} else {
 					var user = data.toObject();
 					delete user['password'];
+					delete user['hashedPassword'];
+					delete user['salt'];
+					delete user['_id'];
 
 					var retDoc = {};
 					retDoc['user'] = user;
-					res.json(200, retDoc);
+					sendSideloaded(res, retDoc);
 				}
 			});
 		}
@@ -219,7 +196,7 @@ exports.show = function(req, res) {
 			var user = doc.toObject();
 			var retDoc = {};
 			retDoc['user'] = user;
-			res.json(200, retDoc);
+			res.json(200);
 		}
 	});
 };
@@ -252,3 +229,55 @@ exports.update = function(req, res) {
 		}
 	});
 };
+
+function sendSideloaded(res, docs) {
+	async.series({
+		names: function(done) {
+			async.map(docs, function(doc, cb) {
+				cb(null, doc.name[0]);
+			}, function(err, results) {
+				if (err) {
+					done(err);
+				}
+				done(null, results);
+			})
+		},
+		rights: function(done) {
+			async.map(docs, function(doc, cb) {
+				cb(null, doc.right[0]);
+			}, function(err, results) {
+				if (err) {
+					done(err);
+				}
+				done(null, results);
+			})
+		},
+		addresses: function(done) {
+			async.map(docs, function(doc, cb) {
+				cb(null, doc.address[0]);
+			}, function(err, results) {
+				if (err) {
+					done(err);
+				}
+				done(null, results);
+			})
+		},
+		users: function(done) {
+			async.map(docs, function(doc, cb) {
+				doc.name = doc.name[0].id;
+				doc.address = doc.address[0].id;
+				doc.right = doc.right[0].id;
+				cb(null, doc);
+			}, function(err, results) {
+				if (err) {
+					done(err);
+				}
+				done(null, results);
+			})
+		}
+	}, function(err, results) {
+		//the whole enchilada
+		res.json(200, results);
+
+	});
+}

@@ -2,7 +2,8 @@ var mongoose = require('mongoose'),
 companySchema = mongoose.Schema,
 addy = require('../models/address.js'),
 phone = require('../models/phone.js'),
-ObjectId = mongoose.Schema.Types.ObjectId;
+ObjectId = mongoose.Schema.Types.ObjectId,
+Mixed = mongoose.Schema.Types.Mixed;
 
 var Company = new companySchema({
 	id:ObjectId,
@@ -12,8 +13,8 @@ var Company = new companySchema({
 	description: String,
 	created: Date,
 	// aux: [],
-	address:[addy.Address],
-	phone:[phone.Phone]	
+	address:Mixed,
+	phone:Mixed	
 });
 
 module.exports = mongoose.model('Company', Company);

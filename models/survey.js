@@ -23,9 +23,9 @@ var Survey = new surveySchema({
 		default: Date.now
 	},
 	points: Number,
-	reward:[reward.Reward],
 	status: String,
 	description: String,
+	reward:[reward.Reward],
 	question: [question.Question]
 });
 

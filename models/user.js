@@ -39,6 +39,7 @@ var User = new userSchema({
 User.methods.encryptPassword = function(password) {
     // return crypto.createHmac('sha1', this.salt).update(password).digest('hex');
     //more secure – 
+    log.info('password: ' + password + ' - salt: ' + this.salt);
     return crypto.pbkdf2Sync(password, this.salt, 10000, 512);
 };
 
